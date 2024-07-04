@@ -5,6 +5,7 @@ import PageNotFound from './component/PageNotFound'
 import { BrowserRouter, Routes,Route } from 'react-router-dom'
 import Home from './component/Home'
 import Cart from './component/Cart'
+import { Toaster } from 'react-hot-toast';
 function App() {
   
   return(
@@ -16,8 +17,8 @@ function App() {
       <Route path='/products' element={<Products/>}/>
       <Route path='/cart' element={<Cart/>}/>
       <Route path='*' element={<PageNotFound/>}/>
-
     </Routes>
+      <Toaster />
 
     </BrowserRouter>
     </>

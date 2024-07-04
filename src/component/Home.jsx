@@ -1,9 +1,10 @@
 import React from 'react'
+import Products from './Products'
 
 function Home() {
   return (
     <div>
-      <h2>This is Home page</h2>
+      <Products/>
     </div>
   )
 }

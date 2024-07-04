@@ -1,27 +1,56 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './cart.css'
 import { Container } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
-import { addToCart } from '../redux/app/cartSlice'
+import { addToCart, removeToCart, removeSingleCart } from '../redux/app/cartSlice'
+import toast from 'react-hot-toast'
 
 const Cart = () => {
-  const dispatch=useDispatch()
-  const data=useSelector((state)=>state.cart.count)
-  const[prodCount,setProdcount]=useState(0)
-  const handleProductInc=(data)=>{
-    if(prodCount>0){
-      setProdcount(prodCount-1)
-    }
+  const [totalPrice, setTotalPrice] = useState()
+  const [totalQuantity, setTotalQuantity] = useState(0)
+  const dispatch = useDispatch()
+  const data = useSelector((state) => state.cart.count)
+
+
+  //increase product quantity by one
+  const handleProductInc = (data) => {
     dispatch(addToCart(data))
-    console.log(data)
   }
-  const handleProductDec=()=>{
-    dispatch()
+
+  //decrease product quantity by one
+  const handleProductDec = (data) => {
+    dispatch(removeSingleCart(data))
   }
-  const handleRemoveProduct=(id)=>{
-      dispatch()
+
+  //remove product from cart
+  const handleRemoveProduct = (id) => {
+    dispatch(removeToCart(id))
+    toast.success('removed from cart')
   }
+
+  const total_Price = () => {
+    let totalPrice = 0;
+    data.map((ele, ind) => {
+      totalPrice = ele.price * ele.quantity + totalPrice;
+    })
+    setTotalPrice(totalPrice)
+  }
+
+  const total_quantity = () => {
+    let totalQuantity = 0;
+    data.map((ele, ind) => {
+      totalQuantity = ele.quantity + totalQuantity;
+    })
+    setTotalQuantity(totalQuantity)
+  }
+  useEffect(() => {
+    total_quantity()
+  }, [total_quantity])
+
+  useEffect(() => {
+    total_Price()
+  }, [total_Price])
   return (
     <>
       <Container>
@@ -30,42 +59,45 @@ const Cart = () => {
             <div className='cart-box'>
               <div className='mt-5 text-center'>
                 <h2>Cart Products</h2><hr />
-              </div>              
-              {data.length > 0?
-                data.map((prod,ind)=>
+              </div>
+              {data.length > 0 ?
+                data.map((prod, ind) =>
                   <div className='cart-wrapper' key={ind}>
-                <div className='cart-img'>
-                  <img src={prod.image} alt="" />
-                </div>
-                <div className='cart-details'>
-                  <div>
-                    <h3>{prod.description}</h3>
-                    <h4>₹{prod.price}</h4>
+                    <div className='cart-img'>
+                      <img src={prod.image} alt="" />
+                    </div>
+                    <div className='cart-details'>
+                      <div>
+                        <h3>{prod.description}</h3>
+                        <h4>₹{prod.price}</h4>
+                      </div>
+                      <div className='cart-product-action' >
+                        <button className='cart-button' onClick={prod.quantity <= 1 ? () => handleRemoveProduct(prod.id) : () => handleProductDec(prod)}>-</button>
+                        <input type="text" value={prod.quantity} disabled />                                {/*  need to change */}
+                        <button className='cart-button' onClick={() => handleProductInc(prod)}>+</button>
+                        <button className='cart-button' onClick={() => handleRemoveProduct(prod.id)}>Remove</button>
+                      </div>
+                    </div>
                   </div>
-                  <div className='cart-product-action' >
-                    <button className='cart-button' onClick={()=>handleProductDec(prod)}>-</button>
-                    <input className='' type="text" value={prodCount} disabled />                                {/*  need to change */}
-                    <button className='cart-button' onClick={()=>handleProductInc(prod)}>+</button>
-                    <button className='cart-button' onClick={()=>handleRemoveProduct(prod.id)}>Remove</button>
-                  </div>
+                ) :
+                <div className='empty-cart'>
+                  <i className='bi bi-cart'></i>
+                  <h2 >Your cart is empty</h2>
                 </div>
-              </div>
-                ):
-              <div className='empty-cart'> 
-                <i className='bi bi-cart'></i>
-                <h2 >Your cart is empty</h2>
-              </div>
               }
               <hr />
-              <div className='d-md-flex justify-content-between'>
-               <div>
-                <span className='fw-bold fs-4'>Total Products: 333</span>
-                </div>
-                <div >
-                <span className='fw-bold fs-4'>Total Price: 1000</span>
-                <button className='ms-5'>CheckOut</button>
-                </div>
-              </div>
+              {
+                data.length > 0 ?
+                  <div className='d-md-flex justify-content-between'>
+                    <div>
+                      <span className='fw-bold fs-4'>Total quantity: {totalQuantity}</span>
+                    </div>
+                    <div >
+                      <span className='fw-bold fs-4'>Total Price: {Math.floor(totalPrice)}</span>
+                      <button className='ms-5' onClick={()=>{toast.success('this feature is not available')}}>CheckOut</button>
+                    </div>
+                  </div> : ''
+              }
 
             </div>
           </div>

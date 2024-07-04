@@ -4,16 +4,20 @@ import React, { useEffect, useState } from 'react'
 import { Container } from 'react-bootstrap';
 import { addToCart } from '../redux/app/cartSlice';
 import { useDispatch } from 'react-redux';
+import toast from 'react-hot-toast';
 const Products = () => {
   const[products,setProducts]=useState([]);
   const dispatch=useDispatch()
   useEffect(()=>{
-    axios.get('https://fakestoreapi.com/products')
+    axios.get('http://localhost:8080/products')
     .then(res=>setProducts(res.data))
   },[])
-  console.log(products)
+  // console.log(products)
+
+  //add new product
 const handleClick=(data)=>{
  dispatch(addToCart(data))
+ toast.success('added to cart')
 }
   return (
    <>
