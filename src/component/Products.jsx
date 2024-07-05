@@ -1,52 +1,59 @@
-import axios from 'axios'
-import './products.css'
-import React, { useEffect, useState } from 'react'
+import './products.css';
+import React, { useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { addToCart } from '../redux/app/cartSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { fetchProducts } from '../redux/app/productSlice';
+
 const Products = () => {
-  const[products,setProducts]=useState([]);
-  const dispatch=useDispatch()
-  useEffect(()=>{
-    axios.get('http://localhost:8080/products')
-    .then(res=>setProducts(res.data))
-  },[])
-  // console.log(products)
+  const dispatch = useDispatch();
+  
+  const { products, loading, error } = useSelector((state) => state.productData);
 
-  //add new product
-const handleClick=(data)=>{
- dispatch(addToCart(data))
- toast.success('added to cart')
-}
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  const handleClick = (product) => {
+    dispatch(addToCart(product));
+    toast.success('Added to cart');
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-   <>
-   <Container>
-   <div className='row justify-content-center'>
-   <h2 className='text-center p-4'>Products</h2>
-<hr />
-    {products.map(prod=>
-      <div className='product-wrapper col-10' key={prod.id}>
-      <div className='product-img'>
-      <img src={prod.image} alt="" />
+    <Container>
+      <div className='row justify-content-center'>
+        <h2 className='text-center p-4'>Products</h2>
+        <hr />
+        {products.map((product) => (
+          <div className='product-wrapper col-10' key={product.id}>
+            <div className='product-img'>
+              <img src={product.image} alt={product.title} />
+            </div>
+            <div className='product-details'>
+              <div>
+                <h3>{product.title}</h3>
+                <p>{product.description}</p>
+                <p>{product.rating.rate}★ {product.rating.count} ratings</p>
+              </div>
+              <div>
+                <h3>₹ {product.price}</h3>
+                <button onClick={() => handleClick(product)}>Add to cart</button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-      <div className='product-details'>
-        <div>
-          <h3>{prod.title}</h3>
-          <p>{prod.description}</p>  
-          <p>{prod.rating.rate}★ {prod.rating.count}rating</p>
-        </div>
-        <div>
-          <h3>₹ {prod.price}</h3>
-          <button onClick={()=>handleClick(prod)}>Add to cart</button>
-        </div>
-      </div>
-    </div>
-    )}
-    </div>
     </Container>
-   </>
-  )
-}
+  );
+};
 
-export default Products
+export default Products;
