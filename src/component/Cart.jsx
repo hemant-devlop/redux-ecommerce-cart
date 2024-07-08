@@ -67,10 +67,8 @@ const Cart = () => {
                       <img src={prod.image} alt="" />
                     </div>
                     <div className='cart-details'>
-                      <div>
-                        <h3>{prod.description}</h3>
+                        <h3>{prod.title}</h3>
                         <h4>₹{prod.price}</h4>
-                      </div>
                       <div className='cart-product-action' >
                         <button className='cart-button' onClick={prod.quantity <= 1 ? () => handleRemoveProduct(prod.id) : () => handleProductDec(prod)}>-</button>
                         <input type="text" value={prod.quantity} disabled />                                {/*  need to change */}
