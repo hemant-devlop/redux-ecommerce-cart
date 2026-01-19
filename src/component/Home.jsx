@@ -5,6 +5,7 @@ function Home() {
   return (
     <div>
       <Products/>
+      <h2>hello i am new code from stage</h2>
     </div>
   )
 }
